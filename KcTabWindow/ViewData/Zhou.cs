@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UiDesktopApp1.ViewData;
+namespace KcTabWindow.ViewData;
 
 public class Zhou
 {

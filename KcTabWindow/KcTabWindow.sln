@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KcTabWindow", "KcTabWindow.csproj", "{30976BFA-47D9-9219-8385-DBAE02DAB4E3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{30976BFA-47D9-9219-8385-DBAE02DAB4E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30976BFA-47D9-9219-8385-DBAE02DAB4E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30976BFA-47D9-9219-8385-DBAE02DAB4E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30976BFA-47D9-9219-8385-DBAE02DAB4E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FAD5EC54-BE93-4554-B832-42F676675EB5}
+	EndGlobalSection
+EndGlobal

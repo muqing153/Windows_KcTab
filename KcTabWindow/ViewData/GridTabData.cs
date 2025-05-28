@@ -1,5 +1,5 @@
 ﻿
-namespace UiDesktopApp1.ViewData;
+namespace KcTabWindow.ViewData;
 
 public class GridTabData
 {
