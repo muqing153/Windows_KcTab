@@ -19,6 +19,10 @@ namespace KcTabWindow.UI
             this.contentDialog = contentDialog;
             InitializeComponent();
             StartButton.Click += StartButton_Click;
+<<<<<<< HEAD
+=======
+            //Debug.WriteLine();
+>>>>>>> b8049479c3bab8bf10ff41db05d567dbf2c6dee3
         }
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
@@ -34,7 +38,10 @@ namespace KcTabWindow.UI
             LoginApi.Token = accountText;
             for(int i = 1; i <= 20; i++)
             {
+<<<<<<< HEAD
 
+=======
+>>>>>>> b8049479c3bab8bf10ff41db05d567dbf2c6dee3
                 string v = await Api.GetCurriculum(i.ToString(), "");
                 var curriculum = JsonConvert.DeserializeObject<Curriculum>(v);
                 Debug.WriteLine(curriculum);

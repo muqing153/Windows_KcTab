@@ -95,6 +95,10 @@
                     Padding="13,0,13,0"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
+<<<<<<< HEAD
+=======
+                    Background="{StaticResource Back}"
+>>>>>>> b8049479c3bab8bf10ff41db05d567dbf2c6dee3
                     Foreground="White"
                     Text="其他登陆方式" />
             </Grid>
