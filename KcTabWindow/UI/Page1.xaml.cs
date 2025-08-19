@@ -9,34 +9,23 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Data;
-using TextBlock = Wpf.Ui.Controls.TextBlock;
-using static System.Net.Mime.MediaTypeNames;
-using Wpf.Ui.Controls;
-using MessageBox = Wpf.Ui.Controls.MessageBox;
-using Wpf.Ui;
-using Wpf.Ui.Extensions;
-using Application = System.Windows.Application;
 namespace KcTabWindow.UI;
-
-public partial class Page1 : Page
+public partial class Page1 : Page, IPageLifecycle
 {
-    //public static string bengzhou = string.Empty;//本周
+    private System.Timers.Timer? timer = new()
+    {
+        AutoReset = true,
+        Interval = 1000
+    };
     public Page1()
     {
         InitializeComponent();
-        //zhoubox.ItemsSource = MainWindow.Zhoulist;
-        System.Timers.Timer timer = new System.Timers.Timer
-        {
-            AutoReset = true,
-            Interval = 1000
-        };
+        this.Unloaded += PageHome_Unloaded;
         timer.Elapsed += (s, e) =>
         {
             var now = DateTime.Now;
             string formattedTime = now.ToString("yyyy-MM-dd HH:mm:ss");
+            Debug.WriteLine(formattedTime);
             Dispatcher.Invoke(() =>
             {
                 itemtext.Text = $"{formattedTime}";
@@ -47,26 +36,30 @@ public partial class Page1 : Page
         zhoubox.SelectionChanged += zhoubox_SelectionChanged;
     }
 
-
-    public async void Init()
+    private void PageHome_Unloaded(object sender, RoutedEventArgs e)
     {
-        var response = JsonConvert.DeserializeObject<TeachingWeek>(new TeachingWeek().Get());
-        zhoubox.ItemsSource = response.Data;
-        if (response.Data != null && response.Data.Count > 0)
+        timer!.Stop();
+        timer!.Dispose();
+        timer = null;
+    }
+
+    public void Init()
+    {
+        List<int> ints = [];
+        for (int i = 1; i <= MainWindow.listPath.Count; i++)
         {
-            if (MainWindow.Curriculum != null)
-            {
-                var mrms = MainWindow.Curriculum.Data[0].Week;
-                //string转int
-                zhoubox.SelectedIndex = mrms - 1;
-                AddDynamicColumns();
-            }
+            ints.Add(i);
         }
-    }
-    private void LoadDataGrid()
-    {
-    }
+        zhoubox.ItemsSource = ints;
+        if (MainWindow.Curriculum != null && MainWindow.Curriculum.Data != null)
+        {
+            var mrms = MainWindow.Curriculum.Data[0].Week;
+            //string转int
+            zhoubox.SelectedIndex = mrms - 1;
+            AddDynamicColumns();
+        }
 
+    }
     public class RowData
     {
         public string StartTime { get; set; } // 开始时间
@@ -141,7 +134,7 @@ public partial class Page1 : Page
                 // 查找符合条件的课程（ClassTime 以 0102 结尾）
                 var course = courses.FirstOrDefault(c => c.ClassTime.EndsWith($"{ric[ric_i]}{ric[ric_i + 1]}") && c.WeekDay == i.ToString());
                 //row.Courses.Add(i.ToString(), course);
-                row.Courses.Add(course??new Curriculum.Course());
+                row.Courses.Add(course ?? new Curriculum.Course());
                 //Debug.WriteLine(course?.ClassroomName);
                 // 如果找到课程，添加格式化字符串；否则添加空字符串
                 //row.Courses.Add(i.ToString(), course != null ? $"{course.CourseName}\n({course.ClassroomName})" : "");
@@ -183,17 +176,6 @@ public partial class Page1 : Page
 
         }
     }
-
-    private void Page_KeyDown(object sender, KeyEventArgs e)
-    {
-        jianpan.Text = $"按下 {e.Key}";
-    }
-
-    private void Page_KeyUp(object sender, KeyEventArgs e)
-    {
-        jianpan.Text = string.Empty;
-    }
-
     private void datagrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
         // 尝试将发送方转换为 DataGrid
@@ -231,21 +213,21 @@ public partial class Page1 : Page
 
                     // 检查 `Courses` 字典中是否存在该索引的数据
                     //&& kcData.Courses.ContainsKey(columnIndex.ToString())
-                    if (kcData.Courses != null )
+                    if (kcData.Courses != null)
                     {
-                        // 获取该列对应的课程信息
-                        var courseInfo = kcData.Courses[columnIndex];
-                        if (courseInfo == null)
-                        {
-                            //System.Windows.MessageBox.Show($"课程信息：{courseInfo}");
-                            return;
-                        }
-                        new ContentDialog(MainWindow.GlobalContentPresenter)
-                        {
-                            Title = "课程详情",
-                            Content = $"{courseInfo.CourseName}\n{courseInfo.TeacherName}\n教室: {courseInfo.ClassroomName}\n时间: {courseInfo.StartTime}-{courseInfo.EndTime}\n{courseInfo.Ktmc}",
-                            CloseButtonText = "关闭"
-                        }.ShowAsync();
+                        //// 获取该列对应的课程信息
+                        //var courseInfo = kcData.Courses[columnIndex];
+                        //if (courseInfo == null)
+                        //{
+                        //    //System.Windows.MessageBox.Show($"课程信息：{courseInfo}");
+                        //    return;
+                        //}
+                        //new ContentDialog(MainWindow.GlobalContentPresenter)
+                        //{
+                        //    Title = "课程详情",
+                        //    Content = $"{courseInfo.CourseName}\n{courseInfo.TeacherName}\n教室: {courseInfo.ClassroomName}\n时间: {courseInfo.StartTime}-{courseInfo.EndTime}\n{courseInfo.Ktmc}",
+                        //    CloseButtonText = "关闭"
+                        //}.ShowAsync();
                     }
                     break;
             }
@@ -265,40 +247,12 @@ public partial class Page1 : Page
             //MainWindow.Curriculum = JsonConvert.DeserializeObject<Curriculum>(await Api.GetCurriculum(selectedIndex.ToString(), ""));
             string v = File.ReadAllText(MainWindow.listPath[selectedIndex]);
             //string v = await Api.GetCurriculumFile(MainWindow.listPath[selectedIndex]);
-            MainWindow.Curriculum= JsonConvert.DeserializeObject<Curriculum>
+            MainWindow.Curriculum = JsonConvert.DeserializeObject<Curriculum>
                 (v);
             //Debug.WriteLine("selectedIndex:"+ selectedIndex);
             AddDynamicColumns(); // 1. 先动态创建列
         }
     }
-
-    private async void Button_Click(object sender, RoutedEventArgs e)
-    {
-        // 获取 ContentDialog 宿主（在 XAML 中定义）
-        var contentDialog = new ContentDialog(KcTabWindow.UI.MainWindow.GlobalContentPresenter)
-        {
-            CloseButtonText = "关闭"
-        };
-        contentDialog.Content = new LoginPage(contentDialog);
-        // 以模态方式显示
-        await contentDialog.ShowAsync();
-        if (LoginApi.Token == "" || LoginApi.Token == null)
-        {
-            //Debug.WriteLine("获取Token失败");
-            return;
-        }
-        Init();
-    }
-    private async void Button_Exit(object sender, RoutedEventArgs e)
-    {
-        //退出登陆
-        LoginApi.UserData.rsa = "";
-        LoginApi.SaveUserData();
-        LoginApi.SaveToken("");
-        Application.Current.Shutdown();
-        //SomeAsyncMethod();
-    }
-
     private async void jietu_Click(object sender, RoutedEventArgs e)
     {
 
@@ -349,5 +303,11 @@ public partial class Page1 : Page
             .AddInlineImage(new Uri(outputPath)) // 添加图片路径
             .Show();
         // Not seeing the Show() method? Make sure you have version 7.0, and if you're using .NET 6 (or later), then your TFM must be net6.0-windows10.0.17763.0 or greater
+    }
+
+    public void OnPageClosed()
+    {
+        timer.Stop();
+        timer = null;
     }
 }

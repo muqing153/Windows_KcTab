@@ -1,9 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using KcTabWindow.ViewData;
+using Microsoft.Win32;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Windows;
 using System.Windows.Controls;
-using KcTabWindow.ViewData;
 using Wpf.Ui.Controls;
 
 namespace KcTabWindow.UI
@@ -11,18 +13,12 @@ namespace KcTabWindow.UI
     /// <summary>
     /// LoginPage.xaml 的交互逻辑
     /// </summary>
-    public partial class LoginPage : Grid
+    public partial class LoginPage : Page
     {
-        ContentDialog contentDialog;
-        public LoginPage(ContentDialog contentDialog)
+        public LoginPage()
         {
-            this.contentDialog = contentDialog;
             InitializeComponent();
             StartButton.Click += StartButton_Click;
-<<<<<<< HEAD
-=======
-            //Debug.WriteLine();
->>>>>>> b8049479c3bab8bf10ff41db05d567dbf2c6dee3
         }
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
@@ -38,10 +34,6 @@ namespace KcTabWindow.UI
             LoginApi.Token = accountText;
             for(int i = 1; i <= 20; i++)
             {
-<<<<<<< HEAD
-
-=======
->>>>>>> b8049479c3bab8bf10ff41db05d567dbf2c6dee3
                 string v = await Api.GetCurriculum(i.ToString(), "");
                 var curriculum = JsonConvert.DeserializeObject<Curriculum>(v);
                 Debug.WriteLine(curriculum);
@@ -53,7 +45,6 @@ namespace KcTabWindow.UI
             }
             StartButton.Content = "导入完成";
             await Task.Delay(1000);
-            contentDialog.Hide();
         }
 
         // TextChanged 事件处理程序
@@ -71,6 +62,31 @@ namespace KcTabWindow.UI
                 StartButton.IsEnabled = true;
             }
             // 这里也可以在每次文本改变时，执行其他逻辑，比如更新按钮的状态
+        }
+        private void KcZipButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 打开文件选择器
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+
+            // 可选：设置初始目录
+            openFileDialog.InitialDirectory = @"C:\";
+            openFileDialog.Filter = "压缩包 (*.kczip)|*.kczip";
+            openFileDialog.Title = "请选择文件";
+            bool? result = openFileDialog.ShowDialog();
+            if (result == true)
+            {
+                string filePath = openFileDialog.FileName;
+                System.Windows.MessageBox.Show("选择的文件: " + filePath);
+                try
+                {
+                    ZipFile.ExtractToDirectory(filePath, System.IO.Path.Combine(AppContext.BaseDirectory, "TabList"));
+                    System.Windows.MessageBox.Show($"解压完成");
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show($"解压失败：{ex.Message}");
+                }
+            }
         }
     }
 }

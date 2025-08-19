@@ -7,10 +7,6 @@
     xmlns:local="clr-namespace:KcTabWindow.UI"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    d:DesignHeight="300"
-    d:DesignWidth="505"
-    KeyDown="Page_KeyDown"
-    KeyUp="Page_KeyUp"
     mc:Ignorable="d">
     <Page.Resources>
         <DataTemplate x:Key="ComboBoxItemTemplate">
@@ -41,32 +37,14 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
-            <ui:TextBlock
-                x:Name="jianpan"
-                Grid.Column="0"
-                VerticalAlignment="Center"
-                Foreground="White"
-                Text="按下" />
             <StackPanel Grid.Column="2" Orientation="Horizontal">
-                <ui:Button
-                    x:Name="loginButton"
-                    Margin="0,0,13,0"
-                    VerticalAlignment="Center"
-                    Click="Button_Click"
-                    Content="更新"
-                    Icon="Fluent24" />
-
                 <ui:Button
                     Margin="0,0,13,0"
                     VerticalAlignment="Center"
                     Click="jietu_Click"
                     Content="截图"
                     Icon="Fluent24" />
-
-                <ComboBox
-                    x:Name="zhoubox"
-                    Margin="0,0,13,0"
-                    ItemTemplate="{StaticResource ComboBoxItemTemplate}" />
+                <ComboBox x:Name="zhoubox" Margin="0,0,13,0" />
                 <ui:TextBlock
                     x:Name="itemtext"
                     VerticalAlignment="Center"

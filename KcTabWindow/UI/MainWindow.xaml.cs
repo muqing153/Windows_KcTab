@@ -17,21 +17,15 @@ namespace KcTabWindow.UI;
 /// </summary>
 public partial class MainWindow : FluentWindow
 {
-    public static ContentPresenter? GlobalContentPresenter;
-
     public static Curriculum? Curriculum;
     public MainWindow()
     {
         InitializeComponent();
-        GlobalContentPresenter = this.ContentPresenter;
-        //Debug.WriteLine(LoginApi.Token);
-        //if ()
-        Init();
+        //RootNavigation.MenuItems[0] = new Page1();s
     }
-   public static List<string> listPath = new List<string>();
+    public static List<string> listPath = new();
     private async void Init()
     {
-
         string wjj = System.IO.Path.Combine(AppContext.BaseDirectory, "TabList");
         if (Directory.Exists(wjj))
         {
@@ -44,29 +38,23 @@ public partial class MainWindow : FluentWindow
                     Debug.WriteLine(item);
                 }
             }
-            //listPath = Array;
             Curriculum = await Api.GetCurriculumFile();
-            startPage();
+            StartPage();
             return;
         }
-        var contentDialog = new Wpf.Ui.Controls.ContentDialog(KcTabWindow.UI.MainWindow.GlobalContentPresenter)
-        {
-            CloseButtonText = "关闭"
-        };
-        contentDialog.Content = new LoginPage(contentDialog);
-        // 以模态方式显示
-        await contentDialog.ShowAsync();
-        Init();
+        RootNavigation.Navigate(typeof(LoginPage));
     }
-    private void startPage()
+    private void StartPage()
     {
-        card.Content = new Page1();
+        RootNavigation.Navigate(typeof(Page1));
     }
-    public static event Action OnLoginChanged;
-
     public static bool IsExist = true;
     private void FluentWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         IsExist = false;
+    }
+    private void RootNavigation_Loaded(object sender, RoutedEventArgs e)
+    {
+        Init();
     }
 }

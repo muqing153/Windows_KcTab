@@ -50,22 +50,15 @@ public class Api
     {
         string wjj = System.IO.Path.Combine(AppContext.BaseDirectory, "TabList");
         //获取当前日期 yyyy-mm-dd
-
         string currentDateStr = DateTime.Now.ToString("yyyy-MM-dd");
         DateTime currentDate = DateTime.Parse(currentDateStr);
         int i = 1;
         foreach (var filePath in MainWindow.listPath)
         {
-            // 用正则表达式提取日期部分（格式 yyyy-MM-dd）
-            Match match = Regex.Match(filePath, @"\d{4}-\d{2}-\d{2}");
-            if (!match.Success)
-                continue; // 跳过不含日期的文件
-
-            string fileDateStr = match.Value;
+            string fileDateStr = System.IO.Path.GetFileNameWithoutExtension(filePath);
             DateTime fileDate = DateTime.Parse(fileDateStr);
-
             // 比较日期是否 >= 今天
-            if (fileDate >= currentDate)
+            if (fileDate >= currentDate || i>= MainWindow.listPath.Count)
             {
                 Debug.WriteLine($"符合要求的文件：{filePath} (日期: {fileDateStr})");
                 Curriculum? curriculum = JsonConvert.DeserializeObject<Curriculum>(File.ReadAllText(filePath));
@@ -74,20 +67,10 @@ public class Api
                     curriculum.Data[0].Week = i;
                     return curriculum;
                 }
-                // 进一步处理...
             }
             i++;
         }
         return new Curriculum();
-
-        //string path = System.IO.Path.Combine(wjj, $"{currentDateStr}.txt");
-
-        //Debug.WriteLine(path);
-        //if (File.Exists(path))
-        //{
-        //    string str = File.ReadAllText(path);
-        //    return str;
-        //}
     }
 
     public static async Task<string> GetCurriculumFile(string currentDateStr)

@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="课程表"
-    Width="1100"
+    Width="1265"
     Height="650"
     d:DataContext="{d:DesignInstance Type=local:MainWindow}"
     d:DesignHeight="450"
@@ -38,13 +38,40 @@
                     <ui:ImageIcon Source="/Assets/wpfui-icon-256.png" />
                 </ui:TitleBar.Icon>
             </ui:TitleBar>
-
-            <Frame
-                Name="card"
+            <ui:NavigationView
+                x:Name="RootNavigation"
                 Grid.Row="1"
                 Grid.Column="0"
-                Margin="9" />
+                IsBackButtonVisible="Visible"
+                Loaded="RootNavigation_Loaded"
+                PaneDisplayMode="LeftFluent">
+                <ui:NavigationView.Header>
+                    <ui:BreadcrumbBar
+                        Margin="42,32,0,0"
+                        FontSize="28"
+                        FontWeight="DemiBold" />
+                </ui:NavigationView.Header>
+                <ui:NavigationView.MenuItems>
+                    <ui:NavigationViewItem Content="课表" TargetPageType="{x:Type local:Page1}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="Table24" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                    <ui:NavigationViewItem Content="登陆" TargetPageType="{x:Type local:LoginPage}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="Person24" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                </ui:NavigationView.MenuItems>
+
+                <ui:NavigationView.FooterMenuItems>
+                    <ui:NavigationViewItem Content="设置">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="Settings24" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                </ui:NavigationView.FooterMenuItems>
+            </ui:NavigationView>
         </Grid>
-        <ContentPresenter x:Name="ContentPresenter" />
     </Grid>
 </ui:FluentWindow>
