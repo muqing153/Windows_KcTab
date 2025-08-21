@@ -14,6 +14,10 @@
                 <ui:ThemesDictionary Theme="Dark" />
                 <ui:ControlsDictionary />
             </ResourceDictionary.MergedDictionaries>
+            <!--  全局 TextBlock 样式  -->
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="White" />
+            </Style>
             <!--  全局ListBoxItem样式，去除点击效果  -->
             <Style x:Key="ListBoxItemButton" TargetType="ListBoxItem">
                 <!--  禁用默认的选中效果  -->

@@ -58,7 +58,7 @@
                             VerticalAlignment="Center"
                             VerticalContentAlignment="Center"
                             Content="《软件协议》"
-                            NavigateUri="https://www.baidu.com" />
+                            NavigateUri="https://muqingcandy.top/UserAgreement.html" />
                         <TextBlock VerticalAlignment="Center" Text="后同意" />
                     </StackPanel>
                 </CheckBox.Content>
@@ -100,6 +100,7 @@
                         Padding="9,0,9,0"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
+                        Foreground="White"
                         Text="其他方式" />
                     <Line
                         HorizontalAlignment="Center"

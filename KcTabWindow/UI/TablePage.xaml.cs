@@ -10,14 +10,14 @@ using System.Windows.Media.Imaging;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json;
 namespace KcTabWindow.UI;
-public partial class Page1 : Page, IPageLifecycle
+public partial class TablePage : Page, IPageLifecycle
 {
     private System.Timers.Timer? timer = new()
     {
         AutoReset = true,
         Interval = 1000
     };
-    public Page1()
+    public TablePage()
     {
         InitializeComponent();
         this.Unloaded += PageHome_Unloaded;
@@ -25,7 +25,7 @@ public partial class Page1 : Page, IPageLifecycle
         {
             var now = DateTime.Now;
             string formattedTime = now.ToString("yyyy-MM-dd HH:mm:ss");
-            Debug.WriteLine(formattedTime);
+            //Debug.WriteLine(formattedTime);
             Dispatcher.Invoke(() =>
             {
                 itemtext.Text = $"{formattedTime}";

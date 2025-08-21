@@ -52,7 +52,11 @@
                         FontWeight="DemiBold" />
                 </ui:NavigationView.Header>
                 <ui:NavigationView.MenuItems>
-                    <ui:NavigationViewItem Content="课表" TargetPageType="{x:Type local:Page1}">
+                    <ui:NavigationViewItem
+                        x:Name="TableView"
+                        Content="课表"
+                        IsEnabled="False"
+                        TargetPageType="{x:Type local:TablePage}">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="Table24" />
                         </ui:NavigationViewItem.Icon>
@@ -65,7 +69,7 @@
                 </ui:NavigationView.MenuItems>
 
                 <ui:NavigationView.FooterMenuItems>
-                    <ui:NavigationViewItem Content="设置">
+                    <ui:NavigationViewItem Content="设置" TargetPageType="{x:Type local:SettingPage}">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="Settings24" />
                         </ui:NavigationViewItem.Icon>

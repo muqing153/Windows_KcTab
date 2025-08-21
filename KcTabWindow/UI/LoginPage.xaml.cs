@@ -66,12 +66,13 @@ namespace KcTabWindow.UI
         private void KcZipButton_Click(object sender, RoutedEventArgs e)
         {
             // 打开文件选择器
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-
-            // 可选：设置初始目录
-            openFileDialog.InitialDirectory = @"C:\";
-            openFileDialog.Filter = "压缩包 (*.kczip)|*.kczip";
-            openFileDialog.Title = "请选择文件";
+            OpenFileDialog openFileDialog = new()
+            {
+                // 可选：设置初始目录
+                InitialDirectory = @"C:\",
+                Filter = "压缩包 (*.kczip)|*.kczip",
+                Title = "请选择文件"
+            };
             bool? result = openFileDialog.ShowDialog();
             if (result == true)
             {
