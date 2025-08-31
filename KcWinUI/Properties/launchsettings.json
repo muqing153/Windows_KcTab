@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "KcWinUI (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "KcWinUI (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}

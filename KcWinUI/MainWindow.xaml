@@ -1,0 +1,72 @@
+﻿<windowex:WindowEx
+    x:Class="KcWinUI.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:KcWinUI"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:windowex="using:WinUIEx"
+    MinWidth="500"
+    MinHeight="500"
+    PersistenceId="MainWindow"
+    mc:Ignorable="d">
+    <Window.SystemBackdrop />
+    <Grid>
+        <Grid
+            x:Name="AppTitleBar"
+            Height="48"
+            Margin="56,0,0,0"
+            VerticalAlignment="Top"
+            Canvas.ZIndex="1"
+            IsHitTestVisible="True">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="IconColumn" Width="Auto" />
+                <ColumnDefinition x:Name="TitleColumn" Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Image
+                x:Name="TitleIcon"
+                Grid.Column="0"
+                Width="16"
+                Height="16"
+                Margin="0,0,6,0"
+                Source="/Assets/WindowIcon.ico" />
+            <TextBlock
+                x:Name="AppTitleBarText"
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                TextWrapping="NoWrap" />
+        </Grid>
+        <NavigationView
+            x:Name="nvSample"
+            DisplayModeChanged="NavigationViewControl_DisplayModeChanged"
+            ExpandedModeThresholdWidth="1280"
+            IsBackButtonVisible="Auto"
+            IsSettingsVisible="True"
+            ItemInvoked="nvSample_ItemInvoked"
+            Loaded="nvSample_Loaded"
+            OpenPaneLength="150">
+            <NavigationView.MenuItems>
+                <NavigationViewItem
+                    x:Name="TableView"
+                    Content="课表"
+                    IsEnabled="False"
+                    Tag="TablePage">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE70A;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem
+                    Content="用户"
+                    Icon="Contact"
+                    Tag="LoginPage" />
+            </NavigationView.MenuItems>
+
+            <!--  内容区：Frame 用来装不同 Page  -->
+            <Frame x:Name="ContentFrame" Padding="16,30,16,16" />
+        </NavigationView>
+
+    </Grid>
+
+</windowex:WindowEx>

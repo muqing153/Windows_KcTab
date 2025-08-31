@@ -1,0 +1,78 @@
+﻿<Application
+    x:Class="KcWinUI.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="using:KcWinUI.Helpers"
+    xmlns:models="using:KcWinUI.Models">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <ResourceDictionary Source="/Styles/FontSizes.xaml" />
+                <ResourceDictionary Source="/Styles/Thickness.xaml" />
+                <ResourceDictionary Source="/Styles/TextBlock.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <helpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+            <DataTemplate x:Key="ItemTable">
+                <Grid
+                    Width="130"
+                    Height="90"
+                    Padding="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        MaxLines="2"
+                        Text="{Binding [0].CourseName}"
+                        TextAlignment="Center"
+                        TextWrapping="Wrap" />
+                    <TextBlock
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        FontSize="11"
+                        MaxLines="2"
+                        Text="{Binding [0].ClassroomName}"
+                        TextAlignment="Center"
+                        TextWrapping="Wrap" />
+                </Grid>
+            </DataTemplate>
+
+
+            <DataTemplate x:Key="ItemTableHeader">
+                <Grid Width="130">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Text="{Binding Xqmc}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        Text="{Binding Mxrq}"
+                        Visibility="{Binding Mxrq, Converter={StaticResource NullToVisibilityConverter}}" />
+
+
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="ItemTableLeft">
+                <Grid Width="130" Height="90">
+                    <TextBlock
+                        Grid.Row="0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Text="{Binding}" />
+                </Grid>
+            </DataTemplate>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
