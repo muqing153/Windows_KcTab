@@ -145,6 +145,8 @@ public partial class LoginPage : Page
             {
                 try
                 {
+                    var json = File.ReadAllText(item);
+                    var curriculum = JsonConvert.DeserializeObject<Curriculum>(json);
                 }
                 catch (Exception ex)
                 {
