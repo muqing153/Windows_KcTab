@@ -51,7 +51,6 @@
                 <NavigationViewItem
                     x:Name="TableView"
                     Content="课表"
-                    IsEnabled="False"
                     Tag="TablePage">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE70A;" />

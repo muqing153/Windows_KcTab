@@ -8,6 +8,7 @@ using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Newtonsoft.Json;
 using Windows.UI.ViewManagement;
 
 namespace KcWinUI;
@@ -128,43 +129,33 @@ public sealed partial class MainWindow : WindowEx
     private async void nvSample_Loaded(object sender, RoutedEventArgs e)
     {
         var wjj = Path.Combine(AppContext.BaseDirectory, "TabList");
-        //Debug.WriteLine(wjj);
         if (!Directory.Exists(wjj))
         {
             Directory.CreateDirectory(wjj);
         }
-        //new DateTime(2025, 2, 1)
         var inihelper = new IniHelper("setting.ini");
-        var year = inihelper.Read("Table", "year", string.Empty);
-        if (year == string.Empty)
+        var user = inihelper.Read("user", "username", string.Empty);
+        if (user == string.Empty)
         {
-            year = GetSchoolYearTerm(DateTime.Now);
-            inihelper.Write("Table", "year", year);
+            user = GetSchoolYearTerm(DateTime.Now);
+            inihelper.Write("user", "username", user);
         }
-        var xuenian = Path.Combine(wjj, year);
-        if (!Directory.Exists(xuenian))
+        //获取wjj的.json文件
+        var wjjs = Directory.GetFiles(Path.Combine(AppContext.BaseDirectory, "TabList"), "*.json");
+        foreach (var item in wjjs)
         {
-            Directory.CreateDirectory(xuenian);
-        }
-        var strings = Directory.GetFiles(xuenian);
-        foreach (var item in strings)
-        {
-            if (item.EndsWith(".txt"))
+            try
             {
+                var v = await File.ReadAllTextAsync(item);
+                JsonConvert.DeserializeObject<Curriculum>(v);
                 listPath.Add(item);
-                Debug.WriteLine(item);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
         }
-        if (listPath.Count == 0)
-        {
-            nvSample.SelectedItem = nvSample.MenuItems[1];
-            ContentFrame.Navigate(typeof(LoginPage),nvSample);
-            return;
-        }
-        TableView.IsEnabled = true;
-        //StartPage();
         nvSample.SelectedItem = nvSample.MenuItems[0];
-
         ContentFrame.Navigate(typeof(TablePage));
         return;
     }

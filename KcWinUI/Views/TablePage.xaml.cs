@@ -1,119 +1,173 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices.WindowsRuntime;
+using KcWinUI.Helpers;
 using KcWinUI.Models;
 using KcWinUI.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Newtonsoft.Json;
 using Windows.Data.Xml.Dom;
 using Windows.Foundation;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI.Notifications;
+using static KcWinUI.Models.Curriculum;
 namespace KcWinUI.Views;
 public partial class TablePage : Page
 {
     public static Curriculum curriculum = new();
-    //public static string? FilePath;
+    public List<List<List<Curriculum.Course>>> CourseList = new();
+    public static string FilePath = "";
+    public string Day
+    {
+        get; set;
+    } = "1";
+    public static int week = 1;
     public TablePage()
     {
+        var iniHelper = new IniHelper("setting.ini");
+        FilePath = System.IO.Path.Combine(AppContext.BaseDirectory, "TabList/"+iniHelper.Read("user", "username","") + ".json");
         InitializeComponent();
         Init();
-        //TableGrid.Header = curriculum.Data[0].Date;
-        TableGrid.ItemsSource = GetKcLei(curriculum);
-        curriculum.Data[0].Date.Insert(0, new()
-        {
-            Xqmc = "节/期"
-        });
-        TableGridHeader.ItemsSource = curriculum.Data[0].Date;
+        //TableGridHeader.ItemsSource = CourseList;
     }
     public async void Init()
     {
-        TablePage.curriculum = await Api.GetCurriculumFile();
+        TablePage.curriculum = await Api.GetCurriculumFile(TablePage.FilePath);
+        curriculum.startDate = Curriculum.GetSemesterStartDate();
+        curriculum.nian = Curriculum.GetCurrentSemester();
+        // 获取当前周
+        week = Curriculum.GetWeekIndex(curriculum.startDate, DateTime.Now.ToString("yyyy-MM-dd"));
+        curriculum.ZhouInt = 20;
+        TableGridHeader.ItemsSource = Curriculum.GetWeekDays(curriculum.startDate, week);
+        //
+        TableGridLeft.ItemsSource = TableTimeData.TimeDatas;
 
-        var listLeft = new List<string>();
-        // 创建节次数据
-        for (var i = 0; i < schedule.Count; i++)
-        {
-            listLeft.Add(schedule[i].Time1 + "\n" + schedule[i].Time2);
-        }
-        TableGridLeft.ItemsSource = listLeft;
-        var listInt = new List<Zhou>();
-        for (var i = 0; i < MainWindow.listPath.Count; i++)
-        {
-            listInt.Add(new()
-            {
-                position = $"{i + 1}",
-                path = MainWindow.listPath[i]
-            });
-        }
-        zhoubox.ItemsSource = listInt;
-        //string 转int
-        zhoubox.SelectedIndex = curriculum.Data[0].TopInfo[0].Week - 1;
-        zhoubox.SelectionChanged += (s, e) =>
-        {
-            Zhou zhou = (Zhou)zhoubox.SelectedItem;
-            var get = Api.GetCurriculumPath(zhou.path);
-            TableGrid.ItemsSource = GetKcLei(get);
-        };
-
-    }
-    private static List<(string Session, string Time1, string Time2)> schedule = new()
-    {
-    ("第 1 节", "08:20 - 09:05", "09:15 - 10:00"),
-    ("第 2 节", "10:10 - 11:40", "10:30 - 12:00"),
-    ("第 3 节", "13:30 - 14:15", "14:25 - 15:10"),
-    ("第 4 节", "15:20 - 16:05", "16:15 - 17:00"),
-    ("第 5 节", "18:30 - 19:15", "19:25 - 20:10")
-};
+        zhoubox.ItemsSource = Enumerable.Range(1, curriculum.ZhouInt)
+            .Select(i => i.ToString())
+            .ToList();
+        zhoubox.SelectedIndex = TablePage.week - 1;
 
 
-    private static readonly string[] classTime = { "0102", "0304", "0506", "0708", "0910" };
-
-    static int GetInt(string str)
-    {
-        for (var i = 0; i < classTime.Length; i++)
-        {
-            if (classTime[i] == str)
-            {
-                return i;
-            }
-        }
-        return 0;
+        // 获取今天几号 
+        Day = DateTime.Now.Day.ToString();
+        // 
     }
 
-    public static List<List<Curriculum.Course>> GetKcLei(Curriculum curriculum)
+    public static List<List<List<Curriculum.Course>>> GetKcLei(Curriculum curriculum, int zhou = 1)
     {
-        var list = new List<List<Curriculum.Course>>();
-
-        // 初始化 6*8 个空列表
-        for (var row = 0; row < 5; row++)
+        var list = new List<List<List<Curriculum.Course>>>();
+        //// 初始化 6*8 个空列表
+        for (var col = 0; col < 7; col++)
         {
-            for (var col = 0; col <7; col++)
+            var day = new List<List<Curriculum.Course>>();
+            for (var row = 0; row < TableTimeData.TimeDatas.Length; row++)
             {
-                list.Add(new List<Curriculum.Course>());
+                var a = new List<Curriculum.Course>
+                {
+                    Curriculum.NewCourse(col, row)
+                };
+                day.Add(a);
             }
+            list.Add(day);
         }
-        foreach (var course in curriculum.Data[0].Courses)
+        if (curriculum.course != null)
         {
-            string classTimeStr = course.ClassTime;
-            string part1 = classTimeStr.Substring(0, 1); // 星期
-            string part2 = classTimeStr.Substring(1, 4); // 节次
+            foreach (var course in curriculum.course)
+            {
+                if (course.ClassWeekDetails != null)
+                {
+                    foreach (var section in course.ClassWeekDetails)
+                    {
+                        // 判断周是否在范围内
+                        if (IsWeekInRange(section.Weeks, zhou))
+                        {
+                            if (section.Weekdays != null)
+                            {
+                                foreach (var weekday in section.Weekdays)
+                                {
+                                    var jies = GetJieData(weekday.Jie);
+                                    if (jies != null && jies.Count > 0)
+                                    {
+                                        var first = jies[0];
+                                        var lastTwo = jies[1];
+                                        var c = JsonConvert.DeserializeObject<Course>(
+                                            JsonConvert.SerializeObject(course)
+                                        ) ?? new Course();
 
-            int dayIndex = int.Parse(part1) - 1; // 星期几 -> 列索引 0~6
-            int periodIndex = GetInt(part2);      // 节次 -> 行索引 0~4
+                                        c.WeekNoteDetail = weekday.Jie;
+                                        c.ClassroomName = weekday.ClassroomName;
+                                        c.Start = lastTwo - 1;
+                                        c.End = jies[^1]; // 最后一个节次
+                                        var d = list[first - 1][lastTwo - 1];
+                                        if (string.IsNullOrEmpty(d[0].CourseName))
+                                        {
+                                            d[0] = c;
+                                        }
+                                        else
+                                        {
+                                            d.Add(course);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-            if (periodIndex < 0 || dayIndex < 0 || dayIndex > 6)
-                continue; // 跳过无效数据
+            // 第二部分：去重合并节次
+            for (int i = 0; i < list.Count; i++)
+            {
+                for (int index = 0; index < list[i].Count; index++)
+                {
+                    try
+                    {
+                        var firstCourse = list[i][index].FirstOrDefault();
+                        if (firstCourse?.WeekNoteDetail != null)
+                        {
+                            var item = Curriculum.GetJieData(firstCourse.WeekNoteDetail);
+                            if (item != null && item.Count > 2)
+                            {
+                                // 删除重复的节次
+                                list[i].RemoveRange(index + 1, item.Count - 2);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Error.WriteLine($"Error: {e.Message}");
+                    }
+                }
+            }
 
-            if (string.IsNullOrEmpty(course.ClassroomName))
-                course.ClassroomName = "网课";
-
-            list[periodIndex * 7 + dayIndex].Add(course);
         }
         return list;
+    }
+    public static bool IsWeekInRange(string? weeks, int zhou)
+    {
+        if (string.IsNullOrEmpty(weeks)) return false;
+        // 支持如 "1-16"、"3,5,7"、"8-12周" 这种格式
+        weeks = weeks.Replace("周", "");
+        foreach (var part in weeks.Split(','))
+        {
+            if (part.Contains('-'))
+            {
+                var range = part.Split('-');
+                if (int.TryParse(range[0], out int start) && int.TryParse(range[1], out int end))
+                {
+                    if (zhou >= start && zhou <= end) return true;
+                }
+            }
+            else if (int.TryParse(part, out int single))
+            {
+                if (zhou == single) return true;
+            }
+        }
+        return false;
     }
 
     private async void Button_Click_jietu(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -219,7 +273,7 @@ public partial class TablePage : Page
                 var content = "";
                 foreach (var item in course)
                 {
-                    content += $"{item.CourseName}\n{item.ClassroomName}\n{item.ClassTime}\n{item.TeacherName}\n{TableGrid.Items.IndexOf(course)}\n\n";
+                    //content += $"{item.CourseName}\n{item.ClassroomName}\n{item.ClassTime}\n{item.TeacherName}\n{TableGrid.Items.IndexOf(course)}\n\n";
                 }
                 contentDialog.Content = content;
                 ContentDialog dialog = contentDialog;
@@ -252,5 +306,27 @@ public partial class TablePage : Page
         //        var result = await dialog.ShowAsync();
 
         //    }}
+    }
+
+    private void zhoubox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (zhoubox.SelectedItem is string zhouStr)
+        {
+            Debug.WriteLine($"选择了: {zhouStr}");
+            TablePage.week = int.Parse(zhouStr);
+            CourseList = GetKcLei(curriculum, week);
+            var index = 0;
+            foreach (var child in GridTable.Children)
+            {
+                if (index > 0)
+                {
+                    if (child is GridView element)
+                    {
+                        element.ItemsSource = CourseList[index - 1];
+                    }
+                }
+                index++;
+            }
+        }
     }
 }

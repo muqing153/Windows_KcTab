@@ -1,4 +1,5 @@
-﻿<Page
+﻿
+<Page
     x:Class="KcWinUI.Views.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -15,7 +16,6 @@
             <RowDefinition Height="48" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
         <TextBlock
             x:Uid="Settings_Title"
             Grid.Row="0"
@@ -57,9 +57,9 @@
                         </RadioButton.CommandParameter>
                     </RadioButton>
                 </StackPanel>
-                <TextBlock Margin="{StaticResource SmallTopBottomMargin}" Text="背景" />
+                <TextBlock Text="背景" />
                 <StackPanel Margin="{StaticResource XSmallTopMargin}" Orientation="Horizontal">
-                    <ComboBox x:Name="beijing_box" Loaded="beijing_box_Loaded">
+                    <ComboBox x:Name="beijing_box">
                         <x:String>Mica</x:String>
                         <x:String>MicaAlt</x:String>
                         <x:String>Acrylic</x:String>
@@ -68,16 +68,24 @@
                 </StackPanel>
             </StackPanel>
 
-            <TextBlock x:Uid="Settings_About" Style="{ThemeResource SubtitleTextBlockStyle}" />
+            <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}" Text="课表" />
+            <StackPanel Margin="{StaticResource XSmallTopMargin}">
+                <TextBlock Text="学年切换" />
+                <ComboBox x:Name="xuenian_box" Margin="{StaticResource XSmallTopMargin}" />
+            </StackPanel>
 
+            <TextBlock x:Uid="Settings_About" Style="{ThemeResource SubtitleTextBlockStyle}" />
             <StackPanel Margin="{StaticResource XSmallTopMargin}">
                 <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" />
-
                 <TextBlock
                     x:Uid="Settings_AboutDescription"
                     Margin="{StaticResource XSmallTopMargin}"
                     Style="{ThemeResource BodyTextBlockStyle}" />
                 <HyperlinkButton x:Uid="SettingsPage_PrivacyTermsLink" Margin="{StaticResource SettingsPageHyperlinkButtonMargin}" />
+                <HyperlinkButton
+                    Margin="{StaticResource SettingsPageHyperlinkButtonMargin}"
+                    Click="HyperlinkButton_Click_newtubiao"
+                    Content="创建图标" />
             </StackPanel>
         </StackPanel>
     </Grid>

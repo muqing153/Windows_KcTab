@@ -1,4 +1,5 @@
-﻿using KcWinUI.Activation;
+﻿using System.Diagnostics;
+using KcWinUI.Activation;
 using KcWinUI.Contracts.Services;
 using KcWinUI.Core.Contracts.Services;
 using KcWinUI.Core.Services;
@@ -12,6 +13,7 @@ using KcWinUI.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
+using Microsoft.Windows.AppLifecycle;
 
 namespace KcWinUI;
 
@@ -45,7 +47,18 @@ public partial class App : Application
 
     public App()
     {
+        //只允许启动一个实例
         InitializeComponent();
+
+        // 确保只允许一个实例
+        var keyInstance = AppInstance.FindOrRegisterForKey("main");
+        if (!keyInstance.IsCurrent)
+        {
+            // 已有实例在运行，重定向并退出
+            keyInstance.RedirectActivationToAsync(AppInstance.GetCurrent().GetActivatedEventArgs()).AsTask().Wait();
+            Process.GetCurrentProcess().Kill(); // 或 Environment.Exit(0);
+            return;
+        }
 
         Host = Microsoft.Extensions.Hosting.Host.
         CreateDefaultBuilder().

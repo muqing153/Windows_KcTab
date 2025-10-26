@@ -39,70 +39,9 @@ public class Api
         request.AddHeader("Connection", "keep-alive");
         RestResponse restResponse = await client.ExecuteAsync(request);
         //if(restResponse.Content)
-        var str=restResponse.Content??string.Empty;
+        var str = restResponse.Content ?? string.Empty;
         return str;
         //return string.Empty;
-    }
-    public static async Task<Curriculum> GetCurriculumFile()
-    {
-        //var wjj = Path.Combine(AppContext.BaseDirectory, "TabList");
-        //wjj = new IniHelper("setting.ini").Read("Table","year",string.Empty);
-        //获取当前日期 yyyy-mm-dd
-        var currentDateStr = DateTime.Now.ToString("yyyy-MM-dd");
-        var currentDate = DateTime.Parse(currentDateStr);
-        var i = 1;
-        foreach (var filePath in MainWindow.listPath)
-        {
-            var fileDateStr = System.IO.Path.GetFileNameWithoutExtension(filePath);
-            var fileDate = DateTime.Parse(fileDateStr);
-            // 比较日期是否 >= 今天
-            if (fileDate >= currentDate || i>= MainWindow.listPath.Count)
-            {
-                Debug.WriteLine($"符合要求的文件：{filePath} (日期: {fileDateStr})");
-                Curriculum? curriculum = JsonConvert.DeserializeObject<Curriculum>(File.ReadAllText(filePath));
-                if (curriculum != null)
-                {
-                    curriculum.Data[0].Week = i;
-                    return curriculum;
-                }
-            }
-            i++;
-        }
-        return new Curriculum();
-    }
-
-    public static async Task<string> GetCurriculumFile(string currentDateStr)
-    {
-        //var wjj = Path.Combine(AppContext.BaseDirectory, "TabList");
-        //wjj = new IniHelper("setting.ini").Read("Table", "year", string.Empty);
-        //获取当前日期 yyyy-mm-dd
-
-        //string currentDateStr = DateTime.Now.ToString("yyyy-MM-dd");
-        DateTime currentDate = DateTime.Parse(currentDateStr);
-
-        foreach (var filePath in MainWindow.listPath)
-        {
-            // 用正则表达式提取日期部分（格式 yyyy-MM-dd）
-            Match match = Regex.Match(filePath, @"\d{4}-\d{2}-\d{2}");
-            if (!match.Success)
-                continue; // 跳过不含日期的文件
-
-            string fileDateStr = match.Value;
-            DateTime fileDate = DateTime.Parse(fileDateStr);
-
-            // 比较日期是否 >= 今天
-            if (fileDate >= currentDate)
-            {
-                Debug.WriteLine($"符合要求的文件：{filePath} (日期: {fileDateStr})");
-                return File.ReadAllText(filePath);
-                // 进一步处理...
-            }
-        }
-        return string.Empty;
-    }
-    public static Curriculum GetCurriculumPath(string path)
-    {
-        return JsonConvert.DeserializeObject<Curriculum>(File.ReadAllText(path))??new Curriculum();
     }
     public static async Task<string> Get_sjkbms()
     {
@@ -121,21 +60,20 @@ public class Api
         var response = await client.ExecuteAsync(request);
         //restRequest.AddHeader("Token", LoginApi.Token);
         //var a = await restClient.ExecuteAsync(restRequest);
-        return response.Content??string.Empty;
+        return response.Content ?? string.Empty;
     }
 
 
-    public static async Task<string> LoginToken(string username,string password)
+    public static async Task<string> LoginToken(string username, string password) 
     {
         var client = new RestClient($"http://jw.qdpec.edu.cn:8088/njwhd/login?userNo={username}&pwd={Encrypt(password)}&encode=1&captchaData=&codeVal=");
-        var request = new RestRequest("",Method.Post);
+        var request = new RestRequest("", Method.Post);
         request.AddHeader("Accept", "application/json, text/plain, */*");
         request.AddHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
         request.AddHeader("Cache-Control", "no-cache");
         request.AddHeader("Connection", "keep-alive");
         request.AddHeader("Origin", "http://jw.qdpec.edu.cn:8088");
         request.AddHeader("Referer", "http://jw.qdpec.edu.cn:8088/");
-        //client.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0";
         request.AddHeader("Host", "jw.qdpec.edu.cn:8088");
         var response = client.Execute(request);
         var json = response.Content;
@@ -149,6 +87,17 @@ public class Api
         return token;
     }
 
+    internal static async Task<Curriculum> GetCurriculumFile(string filePath)
+    {
+        try
+        {
+            var text = File.ReadAllText(filePath);
+            return await Json.ToObjectAsync<Curriculum>(text);
+        }catch (Exception e)
+        {
+            return Curriculum.NewCurriculum();
+        }
+    }
 
     static string Encrypt(string input)
     {

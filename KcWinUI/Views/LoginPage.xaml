@@ -52,13 +52,13 @@
                                 VerticalAlignment="Center"
                                 VerticalContentAlignment="Center"
                                 Content="《软件协议》"
-                                NavigateUri="https://muqingcandy.top/UserAgreement.html" />
+                                NavigateUri="https://muqingcandy.cn/UserAgreement.html" />
                             <TextBlock VerticalAlignment="Center" Text="与" />
                             <HyperlinkButton
                                 VerticalAlignment="Center"
                                 VerticalContentAlignment="Center"
                                 Content="《隐私政策》"
-                                NavigateUri="https://muqingcandy.top/UserAgreement.html#yiyoubiao_privacy_policy" />
+                                NavigateUri="https://muqingcandy.cn/UserAgreement.html#yiyoubiao_privacy_policy" />
                             <TextBlock VerticalAlignment="Center" Text="后同意" />
                         </StackPanel>
                     </CheckBox.Content>
@@ -85,7 +85,6 @@
                         <Button
                             x:Name="KcZipButton"
                             HorizontalAlignment="Center"
-                            Click="KcZipButton_Click"
                             Content=".kczip" />
                         <Button
                             x:Name="KcWebButton"
@@ -93,9 +92,10 @@
                             HorizontalAlignment="Center"
                             Content="网页" />
                         <Button
-                            x:Name="KcTokenButton"
+                            x:Name="ParsJSON"
                             HorizontalAlignment="Center"
-                            Content="Token" />
+                            Click="ParsJson_Click"
+                            Content="JSON" />
                     </StackPanel>
                 </StackPanel>
             </Grid>
