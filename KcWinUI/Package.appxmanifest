@@ -12,14 +12,14 @@
 
   <Identity
     Name="98970585-38a4-430f-a6db-79d83b16d7e6"
-    Publisher="CN=19669"
+    Publisher="CN=muqing, O=muqing, C=CN"
     Version="1.0.0.0" />
     
   <mp:PhoneIdentity PhoneProductId="98970585-38a4-430f-a6db-79d83b16d7e6" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
     
   <Properties>
     <DisplayName>KcWinUI</DisplayName>
-    <PublisherDisplayName>19669</PublisherDisplayName>
+    <PublisherDisplayName>muqing</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 

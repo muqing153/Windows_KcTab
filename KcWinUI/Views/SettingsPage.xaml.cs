@@ -30,40 +30,46 @@ public sealed partial class SettingsPage : Page
             iniHelper.Write("theme", "background", v);
         };
         var wjj = Path.Combine(AppContext.BaseDirectory, "TabList");
-        //获取目录下的年份文件夹
-        var pattern = @"^(?<start>\d{4})-(?<end>\d{4})-(?<index>\d+)$";
-        var regex = new Regex(pattern);
-
-        var sortedFolders = Directory.GetDirectories(wjj)
-            .Select(Path.GetFileName)
-            .Select(name =>
-            {
-                var match = regex.Match(name);
-                if (!match.Success) return null;
-
-                int start = int.Parse(match.Groups["start"].Value);
-                int end = int.Parse(match.Groups["end"].Value);
-                int index = int.Parse(match.Groups["index"].Value);
-
-                // 校验 end == start + 1
-                if (end != start + 1) return null;
-                return new
-                {
-                    Name = name,
-                    StartYear = start,
-                    Index = index
-                };
-            })
-            .Where(x => x != null)
-            .OrderBy(x => x.StartYear) // 先按起始年份排序
-            .ThenBy(x => x.Index)      // 再按序号排序
-            .Select(x => x.Name);
-        var year= iniHelper.Read("Table", "year", string.Empty);
-        if (year != string.Empty && sortedFolders.Count<string>()>0)
+        //获取目录下的学号.json
+        if (!Directory.Exists(wjj))
         {
-            xuenian_box.ItemsSource = sortedFolders;
-            xuenian_box.SelectedItem = year;
+            Directory.CreateDirectory(wjj);
         }
+        // 获取所有匹配 “学号.json” 格式的文件
+        var jsonFiles = Directory.GetFiles(wjj, "*.json", SearchOption.TopDirectoryOnly)
+                                 .ToList();
+        foreach (var file in jsonFiles)
+        {
+            Debug.WriteLine(file);
+            var name = Path.GetFileNameWithoutExtension(file);
+            var item = new ComboBoxItem()
+            {
+                Content = name,
+                Tag = file
+            };
+            xuenian_box.Items.Add(item);
+        }
+        if (jsonFiles.Count==0)
+        { 
+            xuenian_box.IsEnabled = false;
+        }
+        else
+        {
+          var user =  iniHelper.Read("user", "username", "");
+            if (user != "")
+            {
+                var item = xuenian_box.Items.Cast<ComboBoxItem>().FirstOrDefault(i => i.Content.ToString() == user);
+                if (item != null)
+                {
+                    xuenian_box.SelectedItem = item;
+                }
+            }
+        }
+        xuenian_box.SelectionChanged += (s, e) =>
+        {
+            var item = xuenian_box.SelectedItem as ComboBoxItem;
+            iniHelper.Write("user", "username", item?.Content.ToString() ?? "");
+        };
     }
     public static int SetBackground(string str)
     {
@@ -94,8 +100,9 @@ public sealed partial class SettingsPage : Page
 
     private void HyperlinkButton_Click_newtubiao(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-        string shortcutPath = Path.Combine(desktopPath, "一柚表.lnk");
+        var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+        var shortcutPath = Path.Combine(desktopPath, "一柚表.lnk");
+
         var appPath = Path.Combine(AppContext.BaseDirectory, "KcWinUI.exe");
         // 创建 WshShell 对象
         WshShell shell = new WshShell();

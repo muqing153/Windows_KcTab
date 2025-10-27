@@ -4,11 +4,14 @@ namespace KcWinUI.Helpers;
 
 public class IniHelper
 {
-    public string FilePath { get; }
+    public string FilePath
+    {
+        get;
+    }
 
     public IniHelper(string path)
     {
-        FilePath = System.IO.Path.Combine(AppContext.BaseDirectory,path);
+        FilePath = System.IO.Path.Combine(AppContext.BaseDirectory, path);
         if (!System.IO.File.Exists(FilePath))
         {
             System.IO.File.Create(FilePath).Dispose();
@@ -30,8 +33,16 @@ public class IniHelper
     // 读取
     public string Read(string section, string key, string defaultVal = "")
     {
-        var retVal = new StringBuilder(255);
-        GetPrivateProfileString(section, key, defaultVal, retVal, 255, FilePath);
-        return retVal.ToString();
+        try
+        {
+            var retVal = new StringBuilder(255);
+            GetPrivateProfileString(section, key, defaultVal, retVal, 255, FilePath);
+            return retVal.ToString();
+        }
+        catch (Exception ex)
+        {
+
+        }
+        return defaultVal;
     }
 }

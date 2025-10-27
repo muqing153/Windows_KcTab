@@ -6,6 +6,8 @@ using KcWinUI.Models;
 using KcWinUI.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Newtonsoft.Json;
 using Windows.Data.Xml.Dom;
@@ -13,13 +15,15 @@ using Windows.Foundation;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using Windows.System;
+using Windows.UI.Core;
 using Windows.UI.Notifications;
 using static KcWinUI.Models.Curriculum;
 namespace KcWinUI.Views;
 public partial class TablePage : Page
 {
     public static Curriculum curriculum = new();
-    public List<List<List<Curriculum.Course>>> CourseList = new();
+    public List<List<List<Course>>> CourseList = new();
     public static string FilePath = "";
     public string Day
     {
@@ -28,11 +32,12 @@ public partial class TablePage : Page
     public static int week = 1;
     public TablePage()
     {
-        var iniHelper = new IniHelper("setting.ini");
-        FilePath = System.IO.Path.Combine(AppContext.BaseDirectory, "TabList/"+iniHelper.Read("user", "username","") + ".json");
         InitializeComponent();
+        var iniHelper = new IniHelper("setting.ini");
+        FilePath = System.IO.Path.Combine(AppContext.BaseDirectory, "TabList\\" + iniHelper.Read("user", "username", "") + ".json");
+        //Debug.WriteLine(FilePath);
+        ContentGrid.PointerWheelChanged += scrollViewer_PointerWheelChanged;
         Init();
-        //TableGridHeader.ItemsSource = CourseList;
     }
     public async void Init()
     {
@@ -50,8 +55,6 @@ public partial class TablePage : Page
             .Select(i => i.ToString())
             .ToList();
         zhoubox.SelectedIndex = TablePage.week - 1;
-
-
         // 获取今天几号 
         Day = DateTime.Now.Day.ToString();
         // 
@@ -259,7 +262,7 @@ public partial class TablePage : Page
         Debug.WriteLine(e.ClickedItem);
         if (e.ClickedItem is List<Curriculum.Course> course)
         {
-            if (course.Count > 0)
+            if (course.Count > 0 && !string.IsNullOrEmpty(course[0].CourseName))
             {
                 var contentDialog = new ContentDialog
                 {
@@ -273,7 +276,9 @@ public partial class TablePage : Page
                 var content = "";
                 foreach (var item in course)
                 {
-                    //content += $"{item.CourseName}\n{item.ClassroomName}\n{item.ClassTime}\n{item.TeacherName}\n{TableGrid.Items.IndexOf(course)}\n\n";
+                    var starttime = TableTimeData.TimeDatas[item.Start].StartTime;
+                    var endtime = TableTimeData.TimeDatas[item.End - 1].EndTime;
+                    content += $"{item.CourseName}\n{item.ClassroomName}\n{item.ClassTime}\n{item.TeacherName}\n{starttime}-{endtime}\n\n";
                 }
                 contentDialog.Content = content;
                 ContentDialog dialog = contentDialog;
@@ -329,4 +334,60 @@ public partial class TablePage : Page
             }
         }
     }
+
+    private bool isCtrlPressed = false;
+    private bool isShiftPressed = false;
+    private double zoomFactor = 1.0; // 初始缩放比例
+
+
+    private void Page_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        //if (e.Key == VirtualKey.Control) isCtrlPressed = true;
+        //if (e.Key == VirtualKey.Shift) isShiftPressed = true;
+    }
+
+    private void Page_KeyUp(object sender, KeyRoutedEventArgs e)
+    {
+        //if (e.Key == VirtualKey.Control) isCtrlPressed = false;
+        //if (e.Key == VirtualKey.Shift) isShiftPressed = false;
+    }
+
+    private void scrollViewer_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+    {
+        var props = e.GetCurrentPoint(ContentGrid).Properties;
+
+        // Shift 或 Ctrl 判断
+        bool isCtrlPressed = (e.KeyModifiers & VirtualKeyModifiers.Control) == VirtualKeyModifiers.Control;
+        bool isShiftPressed = (e.KeyModifiers & VirtualKeyModifiers.Shift) == VirtualKeyModifiers.Shift;
+
+        if (isCtrlPressed)
+        {
+            double zoomStep = (props.MouseWheelDelta > 0 ? 0.1 : -0.1);
+            double newZoom = scrollViewer.ZoomFactor + zoomStep;
+            newZoom = Math.Max(scrollViewer.MinZoomFactor, Math.Min(scrollViewer.MaxZoomFactor, newZoom));
+
+            // 左上角固定 → 设置水平和垂直偏移为0
+            scrollViewer.ChangeView(0, 0, (float?)newZoom, true);
+
+            e.Handled = true;
+        }
+        else if (isShiftPressed)
+        {
+            // Shift + 滚轮 → 横向滚动
+            double scrollAmount = 50; // 每次滚动的像素
+            double offset = scrollViewer.HorizontalOffset - props.MouseWheelDelta / 3; // 调整滚轮灵敏度
+            scrollViewer.ChangeView(offset, null, null, true);
+
+            e.Handled = true;
+        }
+        else
+        {
+            // 默认竖向滚动
+            double offset = scrollViewer.VerticalOffset - props.MouseWheelDelta / 3;
+            scrollViewer.ChangeView(null, offset, null, true);
+
+            e.Handled = true;
+        }
+    }
+
 }

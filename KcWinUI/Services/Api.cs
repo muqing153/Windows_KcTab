@@ -13,7 +13,6 @@ using RestSharp;
 namespace KcWinUI.Services;
 public class Api
 {
-    public const string api = "http://10.1.2.1";
     public static string Token = string.Empty;
     /// <summary>
     /// 获取课程表
@@ -66,7 +65,14 @@ public class Api
 
     public static async Task<string> LoginToken(string username, string password) 
     {
-        var client = new RestClient($"http://jw.qdpec.edu.cn:8088/njwhd/login?userNo={username}&pwd={Encrypt(password)}&encode=1&captchaData=&codeVal=");
+        var options = new RestClientOptions($"http://jw.qdpec.edu.cn:8088/njwhd/login?userNo={username}&pwd={Encrypt(password)}&encode=1&captchaData=&codeVal=")
+        {
+            FollowRedirects = false,
+            ThrowOnAnyError = false,
+            Proxy = new WebProxy() { UseDefaultCredentials = false }, // 禁用代理
+            UserAgent = "Apifox/1.0.0 (https://apifox.com)",
+        };
+        var client = new RestClient(options);
         var request = new RestRequest("", Method.Post);
         request.AddHeader("Accept", "application/json, text/plain, */*");
         request.AddHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");

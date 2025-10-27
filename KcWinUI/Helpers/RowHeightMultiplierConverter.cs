@@ -15,7 +15,7 @@ public class RowHeightMultiplierConverter : IValueConverter
             var jie = Curriculum.GetJieData(a);
             if (jie != null)
             {
-                Debug.WriteLine(jie.Count-1);
+                //Debug.WriteLine(jie.Count-1);
                 return baseHeight * (jie.Count - 1);
             }
         }

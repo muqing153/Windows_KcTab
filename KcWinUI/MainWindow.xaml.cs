@@ -21,7 +21,6 @@ public sealed partial class MainWindow : WindowEx
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public static List<string> listPath = new();
     public MainWindow()
     {
         InitializeComponent();
@@ -96,65 +95,9 @@ public sealed partial class MainWindow : WindowEx
             Bottom = AppTitleBar.Margin.Bottom
         };
     }
-    public static string GetSchoolYearTerm(DateTime date)
-    {
-        int year = date.Year;
-        int month = date.Month;
-
-        string schoolYear;
-        string term;
-
-        if (month >= 8)
-        {
-            // 8月 ~ 12月：新学年上学期
-            schoolYear = year + "-" + (year + 1);
-            term = "1";
-        }
-        else if (month == 1)
-        {
-            // 1月：依然是上学期，但属于上一年的学年
-            schoolYear = (year - 1) + "-" + year;
-            term = "1";
-        }
-        else
-        {
-            // 2月 ~ 7月：是下学期，属于上一个学年
-            schoolYear = (year - 1) + "-" + year;
-            term = "2";
-        }
-
-        return schoolYear + "-" + term;
-    }
 
     private async void nvSample_Loaded(object sender, RoutedEventArgs e)
     {
-        var wjj = Path.Combine(AppContext.BaseDirectory, "TabList");
-        if (!Directory.Exists(wjj))
-        {
-            Directory.CreateDirectory(wjj);
-        }
-        var inihelper = new IniHelper("setting.ini");
-        var user = inihelper.Read("user", "username", string.Empty);
-        if (user == string.Empty)
-        {
-            user = GetSchoolYearTerm(DateTime.Now);
-            inihelper.Write("user", "username", user);
-        }
-        //获取wjj的.json文件
-        var wjjs = Directory.GetFiles(Path.Combine(AppContext.BaseDirectory, "TabList"), "*.json");
-        foreach (var item in wjjs)
-        {
-            try
-            {
-                var v = await File.ReadAllTextAsync(item);
-                JsonConvert.DeserializeObject<Curriculum>(v);
-                listPath.Add(item);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
-        }
         nvSample.SelectedItem = nvSample.MenuItems[0];
         ContentFrame.Navigate(typeof(TablePage));
         return;

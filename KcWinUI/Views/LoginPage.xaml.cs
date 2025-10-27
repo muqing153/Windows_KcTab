@@ -1,10 +1,5 @@
 ﻿
-
-using System;
 using System.Diagnostics;
-using System.IO.Compression;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using KcWinUI.Helpers;
@@ -13,10 +8,7 @@ using KcWinUI.Services;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Newtonsoft.Json;
-using Windows.Storage;
 using Windows.Storage.Pickers;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
 namespace KcWinUI.Views;
 /// <summary>
 /// LoginPage.xaml 的交互逻辑
@@ -24,7 +16,7 @@ namespace KcWinUI.Views;
 public partial class LoginPage : Page
 {
     public XueXiaoData xueXiao = new();
-    IniHelper iniHelper = new IniHelper("setting.ini");
+    IniHelper iniHelper = new("setting.ini");
     public LoginPage()
     {
         InitializeComponent();
@@ -104,7 +96,7 @@ public partial class LoginPage : Page
             var curriculum = new Curriculum();
             for (var i = 1; i <= 20; i++)
             {
-                var GetCurriculum = await Api.GetCurriculum(i.ToString(),"");
+                var GetCurriculum = await Api.GetCurriculum(i.ToString(), "");
                 curriculum = Curriculum.ParsJSON(GetCurriculum, xueXiao, curriculum);
             }
             Curriculum.SaveCurriculum(wjj, curriculum);
@@ -207,22 +199,23 @@ public partial class LoginPage : Page
         {
             var json = File.ReadAllText(file.Path);
             //读取JSON转成 XueXiaoData
-            
+
             var cu = Curriculum.ParsJSON(json, xueXiao);
             //输出cu JSON
             var options = new JsonSerializerOptions
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull // 忽略 null
             };
-            var jsondata= JsonConvert.SerializeObject(cu, Formatting.None, new JsonSerializerSettings
+            var jsondata = JsonConvert.SerializeObject(cu, Formatting.None, new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore // 忽略 null
             });
-            TablePage.FilePath = System.IO.Path.Combine(AppContext.BaseDirectory, "TabList/" + iniHelper.Read("user", "username", "")+".json");
+            TablePage.FilePath = System.IO.Path.Combine(AppContext.BaseDirectory, "TabList\\" + account.Text + ".json");
             File.WriteAllText(TablePage.FilePath, jsondata);
+            Toast.Subtitle = "导入成功";
+            Toast.IsOpen = true;
         }
         iniHelper.Write("user", "username", account.Text);
-
     }
     /// <summary>
     /// 遍历所有文件

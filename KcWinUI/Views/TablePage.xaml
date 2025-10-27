@@ -4,6 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    KeyDown="Page_KeyDown"
+    KeyUp="Page_KeyUp"
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
@@ -47,7 +49,11 @@
             Padding="13,13,13,16"
             HorizontalScrollBarVisibility="Auto"
             VerticalScrollBarVisibility="Auto">
-            <Grid>
+            <Grid x:Name="ContentGrid">
+
+                <Grid.RenderTransform>
+                    <CompositeTransform x:Name="ContentTransform" />
+                </Grid.RenderTransform>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
